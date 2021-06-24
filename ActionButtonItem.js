@@ -13,7 +13,7 @@ export default class ActionButtonItem extends Component {
             opacity: this.props.anim,
             width: this.props.size,
             height: this.props.size,
-            bottom: 40,
+            bottom: this.props.actionItemBottom,
             marginRight: this.props.right ?? 0,
             marginLeft: this.props.left ?? 0,
             paddingTop: this.props.top ?? 0,

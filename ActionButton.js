@@ -1,103 +1,101 @@
-import React, { Component } from 'react';
+import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import {
-  StyleSheet,
-  Text,
-  View,
   Animated,
+  StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Platform
-} from 'react-native';
-import PropTypes from 'prop-types';
-import ActionButtonItem from './ActionButtonItem';
+  View,
+} from 'react-native'
+import ActionButtonItem from './ActionButtonItem'
 
 const alignMap = {
   center: {
     alignItems: 'center',
     justifyContent: 'flex-end',
     startDegree: 180,
-    endDegree: 360
+    endDegree: 360,
   },
 
   left: {
     alignItems: 'flex-start',
     justifyContent: 'flex-end',
     startDegree: 270,
-    endDegree: 360
+    endDegree: 360,
   },
 
   right: {
     alignItems: 'flex-end',
     justifyContent: 'flex-end',
     startDegree: 180,
-    endDegree: 270
-  }
-};
+    endDegree: 270,
+  },
+}
 
 export default class ActionButton extends Component {
   constructor(props) {
-    super(props);
+    super(props)
     this.state = {
       active: props.active,
-      anim: new Animated.Value(props.active ? 1 : 0)
-    };
+      anim: new Animated.Value(props.active ? 1 : 0),
+    }
 
-    this.timeout = null;
+    this.timeout = null
   }
 
   componentWillUnmount() {
-    clearTimeout(this.timeout);
+    clearTimeout(this.timeout)
   }
 
   getActionButtonStyle() {
-    return [styles.actionBarItem, this.getButtonSize()];
+    return [styles.actionBarItem, this.getButtonSize()]
   }
 
   getActionContainerStyle() {
-    const { alignItems, justifyContent } = alignMap[this.props.position];
+    const { alignItems, justifyContent } = alignMap[this.props.position]
     return [
       styles.overlay,
       styles.actionContainer,
       {
         alignItems,
-        justifyContent
-      }
-    ];
+        justifyContent,
+      },
+    ]
   }
   getActionsStyle() {
-    return [this.getButtonSize()];
+    return [this.getButtonSize()]
   }
 
   getButtonSize() {
     return {
       width: this.props.size,
-      height: this.props.size
-    };
+      height: this.props.size,
+    }
   }
 
   animateButton() {
     if (this.state.active) {
-      this.reset();
-      return;
+      this.reset()
+      return
     }
 
     Animated.spring(this.state.anim, {
       toValue: 1,
-      duration: 250
-    }).start();
+      duration: 250,
+    }).start()
 
-    this.setState({ active: true });
+    this.setState({ active: true })
   }
 
   reset() {
     Animated.spring(this.state.anim, {
       toValue: 0,
-      duration: 250
-    }).start();
+      duration: 250,
+    }).start()
 
     setTimeout(() => {
-      this.setState({ active: false });
-    }, 250);
+      this.setState({ active: false })
+    }, 250)
   }
 
   renderButton() {
@@ -105,16 +103,20 @@ export default class ActionButton extends Component {
       <View
         style={[
           this.getActionButtonStyle(),
-          { marginBottom: 30, marginLeft: 12 }
+
+          {
+            marginBottom: this.props.centerButtonBottomMargin,
+            marginLeft: this.props.centerButtonLeftMargin,
+          },
         ]}
       >
         <TouchableOpacity
           activeOpacity={0.85}
           onLongPress={this.props.onLongPress}
           onPress={() => {
-            this.props.onPress();
+            this.props.onPress()
             if (this.props.children) {
-              this.animateButton();
+              this.animateButton()
             }
           }}
         >
@@ -127,35 +129,35 @@ export default class ActionButton extends Component {
                 borderRadius: this.props.size / 2,
                 backgroundColor: this.state.anim.interpolate({
                   inputRange: [0, 1],
-                  outputRange: [this.props.buttonColor, this.props.btnOutRange]
+                  outputRange: [this.props.buttonColor, this.props.btnOutRange],
                 }),
                 transform: [
                   {
                     scale: this.state.anim.interpolate({
                       inputRange: [0, 1],
-                      outputRange: [1, this.props.outRangeScale]
-                    })
+                      outputRange: [1, this.props.outRangeScale],
+                    }),
                   },
                   {
                     rotate: this.state.anim.interpolate({
                       inputRange: [0, 1],
-                      outputRange: ['0deg', this.props.degrees + 'deg']
-                    })
-                  }
-                ]
-              }
+                      outputRange: ['0deg', this.props.degrees + 'deg'],
+                    }),
+                  },
+                ],
+              },
             ]}
           >
             {this.renderButtonIcon()}
           </Animated.View>
         </TouchableOpacity>
       </View>
-    );
+    )
   }
 
   renderButtonIcon() {
     if (this.props.icon) {
-      return this.props.icon;
+      return this.props.icon
     }
 
     return (
@@ -167,30 +169,30 @@ export default class ActionButton extends Component {
               inputRange: [0, 1],
               outputRange: [
                 this.props.buttonTextColor,
-                this.props.btnOutRangeTxt
-              ]
-            })
-          }
+                this.props.btnOutRangeTxt,
+              ],
+            }),
+          },
         ]}
       >
         +
       </Animated.Text>
-    );
+    )
   }
 
   renderActions() {
-    if (!this.state.active) return null;
+    if (!this.state.active) return null
     const startDegree =
-      this.props.startDegree || alignMap[this.props.position].startDegree;
+      this.props.startDegree || alignMap[this.props.position].startDegree
     const endDegree =
-      this.props.endDegree || alignMap[this.props.position].endDegree;
-    const startRadian = (startDegree * Math.PI) / 180;
-    const endRadian = (endDegree * Math.PI) / 180;
+      this.props.endDegree || alignMap[this.props.position].endDegree
+    const startRadian = (startDegree * Math.PI) / 180
+    const endRadian = (endDegree * Math.PI) / 180
 
-    const childrenCount = React.Children.count(this.props.children);
-    let offset = 0;
+    const childrenCount = React.Children.count(this.props.children)
+    let offset = 0
     if (childrenCount !== 1) {
-      offset = (endRadian - startRadian) / (childrenCount - 1);
+      offset = (endRadian - startRadian) / (childrenCount - 1)
     }
 
     return React.Children.map(this.props.children, (button, index) => {
@@ -199,7 +201,7 @@ export default class ActionButton extends Component {
           pointerEvents="box-none"
           style={[
             this.getActionContainerStyle(),
-            { marginBottom: Platform.OS === 'ios' ? 35 : 20, marginLeft: 10 }
+            /* { marginBottom: Platform.OS === 'ios' ? 35 : 20, marginLeft: 10 } */
           ]}
         >
           <ActionButtonItem
@@ -214,39 +216,40 @@ export default class ActionButton extends Component {
             onPress={() => {
               if (this.props.autoInactive) {
                 this.timeout = setTimeout(() => {
-                  this.reset();
-                }, 200);
+                  this.reset()
+                }, 200)
               }
-              button.props.onPress();
+              button.props.onPress()
             }}
+            actionItemBottom={this.props.actionItemBottom}
           />
         </View>
-      );
-    });
+      )
+    })
   }
 
   render() {
-    let backdrop;
+    let backdrop
     if (this.state.active) {
       backdrop = (
         <TouchableWithoutFeedback
           style={styles.overlay}
           onPress={() => {
-            this.reset();
-            this.props.onOverlayPress();
+            this.reset()
+            this.props.onOverlayPress()
           }}
         >
           <Animated.View
             style={{
               backgroundColor: this.props.bgColor,
               opacity: this.state.anim,
-              flex: 1
+              flex: 1,
             }}
           >
             {this.props.backdrop}
           </Animated.View>
         </TouchableWithoutFeedback>
-      );
+      )
     }
     return (
       <View pointerEvents="box-none" style={styles.overlay}>
@@ -257,11 +260,11 @@ export default class ActionButton extends Component {
           {this.renderButton()}
         </View>
       </View>
-    );
+    )
   }
 }
 
-ActionButton.Item = ActionButtonItem;
+ActionButton.Item = ActionButtonItem
 
 ActionButton.propTypes = {
   active: PropTypes.bool,
@@ -278,8 +281,8 @@ ActionButton.propTypes = {
   endDegree: PropTypes.number,
   radius: PropTypes.number,
   children: PropTypes.node,
-  position: PropTypes.oneOf(['left', 'center', 'right'])
-};
+  position: PropTypes.oneOf(['left', 'center', 'right']),
+}
 
 ActionButton.defaultProps = {
   active: false,
@@ -297,8 +300,8 @@ ActionButton.defaultProps = {
   itemSize: 36,
   radius: 100,
   btnOutRange: 'rgba(0,0,0,1)',
-  btnOutRangeTxt: 'rgba(255,255,255,1)'
-};
+  btnOutRangeTxt: 'rgba(255,255,255,1)',
+}
 
 const styles = StyleSheet.create({
   overlay: {
@@ -307,16 +310,16 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     top: 0,
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   },
   actionContainer: {
     flexDirection: 'column',
-    padding: 10
+    padding: 10,
   },
   actionBarItem: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'transparent'
+    backgroundColor: 'transparent',
   },
   btn: {
     justifyContent: 'center',
@@ -324,15 +327,15 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowOffset: {
       width: 0,
-      height: 1
+      height: 1,
     },
     shadowColor: '#444',
-    shadowRadius: 1
+    shadowRadius: 1,
   },
   btnText: {
     marginTop: -4,
     fontSize: 24,
     backgroundColor: 'transparent',
-    position: 'relative'
-  }
-});
+    position: 'relative',
+  },
+})
